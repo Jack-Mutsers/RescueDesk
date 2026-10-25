@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>RescueDesk</AssemblyName>
+    <RootNamespace>RescueDesk</RootNamespace>
+    <ApplicationIcon>Assets\RescueDesk.ico</ApplicationIcon>
+    <!-- Raw volume access needs administrator rights. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.0.0-local</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Product>RescueDesk</Product>
+    <Copyright>Copyright © 2026 Jack Mutsers. Licensed under GPL-3.0.</Copyright>
+    <Description>Recover deleted and lost files from partitions</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\RescueDesk.ico" />
+    <Compile Remove="tools\**" />
+    <Page Remove="tools\**" />
+    <None Remove="tools\**" />
+  </ItemGroup>
+
+</Project>

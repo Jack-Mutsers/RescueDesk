@@ -1,0 +1,53 @@
+# Builds a test installer for every push to develop and every pull request into main.
+# The installer is attached to the workflow run as an artifact (not a release), so it
+# can be tested before anything is merged into main and released to users.
+name: Test build
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # all tags, to number the test build after the next release
+
+      - name: Work out test version
+        id: version
+        shell: pwsh
+        run: |
+          $versions = git tag --list 'v*' |
+            Where-Object { $_ -match '^v\d+\.\d+\.\d+$' } |
+            ForEach-Object { [version]$_.Substring(1) } |
+            Sort-Object -Descending
+          $next = if ($versions) { '{0}.{1}.{2}' -f $versions[0].Major, $versions[0].Minor, ($versions[0].Build + 1) } else { '1.0.0' }
+          $v = "$next-test.${{ github.run_number }}"
+          "version=$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Test build $v"
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+
+      - name: Build installer
+        shell: pwsh
+        run: ./build-installer.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RescueDesk-Setup-${{ steps.version.outputs.version }}
+          path: dist/RescueDesk-Setup-${{ steps.version.outputs.version }}.exe
+          retention-days: 30
