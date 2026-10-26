@@ -12,8 +12,14 @@
 
         <!-- Sidebar: source, scan modes, progress -->
         <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
-            <DockPanel Margin="20,18,20,18">
-                <StackPanel DockPanel.Dock="Top">
+            <Grid Margin="0,18,0,18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <!-- Scrolls when the expanded file type list doesn't fit. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                <StackPanel Margin="20,0">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Assets/RescueDesk.ico" Width="28" Height="28" Margin="0,0,10,0"/>
                         <TextBlock Text="RescueDesk" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
@@ -71,15 +77,16 @@
                         </ItemsControl>
                     </Expander>
                 </StackPanel>
+                </ScrollViewer>
 
                 <!-- Progress -->
-                <StackPanel x:Name="ProgressPanel" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Visibility="Collapsed">
+                <StackPanel x:Name="ProgressPanel" Grid.Row="1" Margin="20,12,20,0" Visibility="Collapsed">
                     <TextBlock x:Name="ProgressText" Style="{StaticResource Hint}" Margin="0,0,0,6"/>
                     <ProgressBar x:Name="ProgressBar" Height="6" Maximum="1" Foreground="{DynamicResource AccentBrush}" BorderThickness="0" Background="{DynamicResource TrackBrush}"/>
                     <Button x:Name="CancelButton" Style="{StaticResource SoftButton}" Content="Cancel" Margin="0,10,0,0"
                             HorizontalAlignment="Left" Click="Cancel_Click"/>
                 </StackPanel>
-            </DockPanel>
+            </Grid>
         </Border>
 
         <!-- Results -->

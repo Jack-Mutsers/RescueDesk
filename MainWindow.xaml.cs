@@ -398,12 +398,13 @@ public partial class MainWindow : Window
         if (dlg.ShowDialog(this) != true) return;
         var dest = dlg.FolderName;
 
-        if (_source.DriveRoot is { } root && string.Equals(Path.GetPathRoot(dest), root, StringComparison.OrdinalIgnoreCase))
-        {
-            MessageBox.Show(this, $"You can't save to {root.TrimEnd('\\')}, the drive you are recovering from: writing there could overwrite the files you're trying to rescue.\n\nPick a folder on another drive, such as a USB stick or external disk.",
-                "RescueDesk", MessageBoxButton.OK, MessageBoxImage.Warning);
+        // Saving to the source drive is allowed (often it is the only drive), but deleted files can be overwritten
+        // by the copies, so warn unless every selected file still exists.
+        if (_source.DriveRoot is { } root && string.Equals(Path.GetPathRoot(dest), root, StringComparison.OrdinalIgnoreCase)
+            && files.Any(f => f.Kind != FoundKind.Existing)
+            && MessageBox.Show(this, $"{root.TrimEnd('\\')} is the drive you are recovering from. Writing the recovered files there can overwrite deleted files that haven't been saved yet, so some of them may come back damaged.\n\nA folder on another drive, such as a USB stick or external disk, is safer. Save to {root.TrimEnd('\\')} anyway?",
+                "RescueDesk", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
             return;
-        }
         if (_source.Kind == SourceKind.PhysicalDisk && MessageBox.Show(this,
                 $"Make sure {dest} is not on the disk you are scanning, or recovered files could overwrite lost ones.\n\nContinue?",
                 "RescueDesk", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
